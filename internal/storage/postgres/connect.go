@@ -4,8 +4,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func Connect() (*sqlx.DB, error) {
-	db, err := sqlx.Connect("postgres", "user=foo dbname=bar sslmode=disable")
+func Connect(dbString string) (*sqlx.DB, error) {
+	db, err := sqlx.Connect("postgres", dbString)
 	if err != nil {
 		return nil, err
 	}
