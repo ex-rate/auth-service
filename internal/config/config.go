@@ -1,9 +1,6 @@
 package config
 
 import (
-	"flag"
-	"fmt"
-
 	"github.com/spf13/viper"
 )
 
@@ -15,21 +12,11 @@ type Config struct {
 	SecretKey        string `mapstructure:"SECRET_KEY"`
 }
 
-func LoadConfig() (*Config, error) {
-	var path, fileName string
+func LoadConfig(path, name string) (*Config, error) {
+	viper.SetConfigFile(name)
+	viper.AddConfigPath(path)
 
-	flag.StringVar(&path, "path", ".", "path to config file")
-	flag.StringVar(&fileName, "name", ".env", "config file name")
-	flag.Parse()
-
-	//name := fmt.Sprintf("%s/%s", path, fileName)
-
-	viper.SetConfigFile(".env")
-
-	//viper.AddConfigPath(path)
 	viper.AutomaticEnv()
-
-	fmt.Println(path, fileName)
 
 	conf := Config{}
 

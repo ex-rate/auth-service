@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -13,17 +13,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	r := setup()
+func Start(path, name string) {
+	r := setup(path, name)
 
 	if err := r.Run(); err != nil {
 		log.Fatal("unable to start server: ", err)
 	}
 }
 
-func setup() *gin.Engine {
+func setup(path, name string) *gin.Engine {
 	// config
-	conf, err := config.LoadConfig()
+	conf, err := config.LoadConfig(path, name)
 	if err != nil {
 		log.Fatal("unable to load config: ", err)
 	}
