@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS auth.users CASCADE;
+DROP TABLE IF EXISTS auth.emails CASCADE;
+DROP TABLE IF EXISTS auth.verification_codes CASCADE;
+DROP TABLE IF EXISTS auth.tokens CASCADE;
+DROP TABLE IF EXISTS auth.reset_pwd_tokens CASCADE;
+DROP TRIGGER IF EXISTS users_insert ON auth.users CASCADE;
+DROP SCHEMA IF EXISTS auth;
