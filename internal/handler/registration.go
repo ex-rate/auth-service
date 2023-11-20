@@ -9,7 +9,6 @@ import (
 
 func (h *handler) Registration(ctx *gin.Context) {
 	var reg schema.Registration
-	// TODO: добавить редирект на верификацию
 	if err := ctx.Bind(&reg); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid JSON", "err": err})
 	}

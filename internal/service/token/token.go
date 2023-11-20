@@ -7,7 +7,15 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func (s *Service) GenerateToken(user schema.Registration) (string, error) {
+type token struct {
+	secretKey string
+}
+
+func New(secretKey string) *token {
+	return &token{secretKey: secretKey}
+}
+
+func (s *token) GenerateToken(user schema.Registration) (string, error) {
 	key := []byte(s.secretKey)
 
 	token := jwt.New(jwt.SigningMethodEdDSA)

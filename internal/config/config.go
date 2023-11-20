@@ -1,6 +1,11 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"flag"
+	"fmt"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	PostgresUser     string `mapstructure:"POSTGRES_USER"`
@@ -10,10 +15,21 @@ type Config struct {
 	SecretKey        string `mapstructure:"SECRET_KEY"`
 }
 
-func LoadConfig(path, fileName string) (*Config, error) {
-	viper.SetConfigFile(fileName)
-	viper.AddConfigPath(path)
+func LoadConfig() (*Config, error) {
+	var path, fileName string
+
+	flag.StringVar(&path, "path", ".", "path to config file")
+	flag.StringVar(&fileName, "name", ".env", "config file name")
+	flag.Parse()
+
+	//name := fmt.Sprintf("%s/%s", path, fileName)
+
+	viper.SetConfigFile(".env")
+
+	//viper.AddConfigPath(path)
 	viper.AutomaticEnv()
+
+	fmt.Println(path, fileName)
 
 	conf := Config{}
 

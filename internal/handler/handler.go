@@ -1,11 +1,15 @@
 package handler
 
-import "github.com/ex-rate/auth-service/internal/service"
+import schema "github.com/ex-rate/auth-service/internal/schemas"
 
 type handler struct {
-	service *service.Service
+	registration registration
 }
 
-func New(service *service.Service) *handler {
-	return &handler{service: service}
+type registration interface {
+	RegisterUser(user schema.Registration) (string, error)
+}
+
+func New(registration registration) *handler {
+	return &handler{registration}
 }
