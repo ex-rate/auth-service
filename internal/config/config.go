@@ -9,6 +9,8 @@ type Config struct {
 	PostgresPassword string `mapstructure:"POSTGRES_PASSWORD"`
 	PostgresDB       string `mapstructure:"POSTGRES_DB"`
 	PostgresPort     string `mapstructure:"POSTGRES_PORT"`
+	ServerHost       string `mapstructure:"SERVER_HOST"`
+	ServerPort       string `mapstructure:"SERVER_PORT"`
 	SecretKey        string `mapstructure:"SECRET_KEY"`
 }
 
