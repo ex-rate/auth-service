@@ -41,7 +41,7 @@ func runServer(ctx context.Context, srv *http.Server) error {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen and serve: %v", err)
+			log.Fatalf("listen and serve err: %v", err)
 		}
 	}()
 
@@ -85,10 +85,8 @@ func setup(path, name string) *http.Server {
 
 	r := gin.Default()
 
-	r.GET("/signup", handler.Registration)
-	r.GET("/confirm", handler.Confirm)
-
-	fmt.Println(conf.ServerHost, conf.ServerPort)
+	r.POST("/signup", handler.Registration)
+	r.POST("/confirm", handler.Confirm)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", conf.ServerHost, conf.ServerPort),

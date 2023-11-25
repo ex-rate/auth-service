@@ -16,9 +16,8 @@ func New(secretKey string) *token {
 }
 
 func (s *token) GenerateToken(user schema.Registration) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
 	key := []byte(s.secretKey)
-
-	token := jwt.New(jwt.SigningMethodEdDSA)
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(10 * time.Minute) // поменять потом

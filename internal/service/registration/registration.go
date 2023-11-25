@@ -1,14 +1,20 @@
 package service
 
-import schema "github.com/ex-rate/auth-service/internal/schemas"
+import (
+	"context"
+
+	schema "github.com/ex-rate/auth-service/internal/schemas"
+	service "github.com/ex-rate/auth-service/internal/service/token"
+)
 
 type registration struct {
 	registrationRepo registrationRepo
 	token            token
 }
 
+//go:generate mockgen -source registration.go -destination ../../mocks/registration_repo.go
 type registrationRepo interface {
-	CreateUser(reg schema.Registration) error
+	CreateUser(ctx context.Context, reg schema.Registration) error
 }
 
 type token interface {
@@ -19,8 +25,15 @@ func New(registrationRepo registrationRepo, token token) *registration {
 	return &registration{registrationRepo: registrationRepo, token: token}
 }
 
-func (s *registration) RegisterUser(user schema.Registration) (string, error) {
-	err := s.registrationRepo.CreateUser(user) // создаем юзера в базе
+func (s *registration) RegisterUser(ctx context.Context, user schema.Registration) (string, error) {
+	password, err := service.HashPassword(user.HashedPassword)
+	if err != nil {
+		return "", err
+	}
+
+	user.HashedPassword = password
+
+	err = s.registrationRepo.CreateUser(ctx, user) // создаем юзера в базе
 	if err != nil {
 		return "", err
 	}
