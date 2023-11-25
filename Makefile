@@ -13,4 +13,7 @@ initdb:
 dropdb:
 	migrate -path migration -database "$(DB_URL)" -verbose down 1
 
-.PHONY: initdb dropdb
+test:
+	go test ./...
+
+.PHONY: initdb dropdb test
