@@ -2,7 +2,10 @@ name: go vet test
 
 on:
   pull_request:
-    [ "main", "develop" ]
+    branches:
+      - main
+      - develop
+    # [ "main", "develop" ]
 
 jobs:
     audit:
