@@ -7,13 +7,14 @@ import (
 )
 
 type handler struct {
-	registration registration
+	service service
 }
 
-type registration interface {
-	RegisterUser(ctx context.Context, user schema.Registration) (string, error)
+type service interface {
+	RegisterUser(ctx context.Context, user schema.Registration) (*schema.Token, error)
+	RestoreToken(ctx context.Context, token string) (*schema.Token, error)
 }
 
-func New(registration registration) *handler {
-	return &handler{registration}
+func New(service service) *handler {
+	return &handler{service}
 }

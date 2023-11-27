@@ -38,6 +38,14 @@ CREATE TABLE auth.tokens (
     expiration_time TIMESTAMP NOT NULL
 );
 
+-- Создание таблицы "auth.refresh_tokens"
+CREATE TABLE auth.refresh_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(user_id) ON DELETE CASCADE UNIQUE,
+    token VARCHAR(255) NOT NULL,
+    expiration_time int NOT NULL
+);
+
 -- Создание таблицы "auth.reset_pwd_tokens"
 CREATE TABLE auth.reset_pwd_tokens (
     id SERIAL PRIMARY KEY,

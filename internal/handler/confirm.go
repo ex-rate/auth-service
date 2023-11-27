@@ -20,7 +20,7 @@ func (h *handler) Confirm(ctx *gin.Context) {
 
 	c := ctx.Request.Context()
 
-	token, err := h.registration.RegisterUser(c, user)
+	token, err := h.service.RegisterUser(c, user)
 	if err != nil {
 		if errors.Is(err, api_errors.ErrUsernameAlreadyExists) || errors.Is(err, api_errors.ErrEmailAlreadyExists) ||
 			errors.Is(err, api_errors.ErrPhoneAlreadyExists) {
@@ -31,5 +31,7 @@ func (h *handler) Confirm(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "user successfully created", "token": token})
+	jsonMsg := gin.H{"message": "user successfully created", "access-token": token.AccessToken, "refresh-token": token.RefreshToken}
+
+	ctx.JSON(http.StatusOK, jsonMsg)
 }

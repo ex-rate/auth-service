@@ -1,33 +1,54 @@
 package service
 
 import (
+	"context"
+	"fmt"
 	"time"
 
-	schema "github.com/ex-rate/auth-service/internal/schemas"
+	"github.com/ex-rate/auth-service/internal/entities"
+	api_errors "github.com/ex-rate/auth-service/internal/errors"
 	"github.com/golang-jwt/jwt"
 )
 
 type token struct {
 	secretKey string
+	tokenRepo tokenRepo
 }
 
-func New(secretKey string) *token {
-	return &token{secretKey: secretKey}
+type tokenRepo interface {
+	CreateToken(ctx context.Context, token *entities.Token) error
+	CheckToken(ctx context.Context, token *entities.Token) error
 }
 
-func (s *token) GenerateToken(user schema.Registration) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	key := []byte(s.secretKey)
+func New(secretKey string, tokenRepo tokenRepo) *token {
+	return &token{secretKey: secretKey, tokenRepo: tokenRepo}
+}
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(10 * time.Minute) // поменять потом
-	claims["authorized"] = true
-	claims["user"] = user.Username
+func (s *token) CheckToken(ctx context.Context, token string) (string, error) {
+	t, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("there was an error")
+		}
+		return []byte("secret"), nil
+	})
 
-	tokenString, err := token.SignedString(key)
+	if !t.Valid {
+		return "", api_errors.ErrInvalidToken
+	}
+
 	if err != nil {
 		return "", err
 	}
 
-	return tokenString, nil
+	mapClaims := t.Claims.(jwt.MapClaims)
+	expr := mapClaims["expr"].(time.Time).Unix()
+
+	entity := &entities.Token{
+		RefreshToken: token,
+		ExpTime:      expr,
+	}
+
+	username := mapClaims["user"].(string)
+
+	return username, s.tokenRepo.CheckToken(ctx, entity)
 }

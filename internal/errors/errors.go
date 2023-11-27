@@ -8,3 +8,5 @@ var ErrPasswordIncorrect = errors.New("password is incorrect")
 var ErrEmailAlreadyExists = errors.New("email already exists")
 var ErrPhoneAlreadyExists = errors.New("phone already exists")
 var ErrUsernameAlreadyExists = errors.New("username already exists")
+
+var ErrInvalidToken = errors.New("token is invalid")

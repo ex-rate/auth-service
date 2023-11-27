@@ -12,10 +12,12 @@ import (
 	"github.com/ex-rate/auth-service/internal/closer"
 	"github.com/ex-rate/auth-service/internal/config"
 	"github.com/ex-rate/auth-service/internal/handler"
-	service "github.com/ex-rate/auth-service/internal/service/registration"
+	"github.com/ex-rate/auth-service/internal/service"
+	registration "github.com/ex-rate/auth-service/internal/service/registration"
 	token "github.com/ex-rate/auth-service/internal/service/token"
 	storage "github.com/ex-rate/auth-service/internal/storage/postgres"
-	"github.com/ex-rate/auth-service/internal/storage/postgres/registration"
+	registration_repo "github.com/ex-rate/auth-service/internal/storage/postgres/registration"
+	token_repo "github.com/ex-rate/auth-service/internal/storage/postgres/token"
 	"github.com/gin-gonic/gin"
 )
 
@@ -75,18 +77,22 @@ func setup(path, name string) *http.Server {
 	}
 
 	// repositories
-	registrationRepo := registration.New(conn)
+	registrationRepo := registration_repo.New(conn)
+	tokenRepo := token_repo.New(conn)
 
 	// services
-	tokenSrv := token.New(conf.SecretKey)
-	registrationSrv := service.New(registrationRepo, tokenSrv)
+	tokenSrv := token.New(conf.SecretKey, tokenRepo)
+	registrationSrv := registration.New(registrationRepo, tokenSrv)
 
-	handler := handler.New(registrationSrv)
+	service := service.New(registrationSrv, tokenSrv)
+
+	handler := handler.New(service)
 
 	r := gin.Default()
 
 	r.POST("/signup", handler.Registration)
 	r.POST("/confirm", handler.Confirm)
+	r.POST("/restore_token", handler.RestoreToken)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", conf.ServerHost, conf.ServerPort),
