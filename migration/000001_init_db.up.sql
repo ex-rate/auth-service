@@ -38,6 +38,8 @@ CREATE TABLE auth.tokens (
     expiration_time TIMESTAMP NOT NULL
 );
 
+
+
 -- Создание таблицы "auth.refresh_tokens"
 CREATE TABLE auth.refresh_tokens (
     id SERIAL PRIMARY KEY,
