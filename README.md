@@ -28,3 +28,5 @@ go run . -name 'filename.env'
 ```
 go run . -path 'path/to/file'
 ```
+
+Happy coding! :relaxed:
