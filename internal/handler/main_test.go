@@ -11,13 +11,19 @@ import (
 )
 
 func testRequest(t *testing.T, ts *httptest.Server, method,
-	path string, body io.Reader) *http.Response {
+	path string, body io.Reader, headers map[string]string) *http.Response {
 
 	req, err := http.NewRequest(method, ts.URL+path, body)
 	req.Close = true
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "PostmanRuntime/7.32.3")
 	require.NoError(t, err)
+
+	if len(headers) > 0 {
+		for k, v := range headers {
+			req.Header.Add(k, v)
+		}
+	}
 
 	ts.Client()
 
@@ -36,6 +42,7 @@ func runTestServer(handler handler) (*gin.Engine, error) {
 
 	r.POST("/signup", handler.Registration)
 	r.POST("/confirm", handler.Confirm)
+	r.POST("/restore_token", handler.RestoreToken)
 
 	return r, nil
 }

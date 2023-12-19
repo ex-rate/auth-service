@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// GenerateToken генерирует новые токены: refresh и access
 func (s *token) GenerateToken(ctx context.Context, user entities.Token) (*schema.Token, error) {
 	accessToken, err := s.accessToken(user.Username)
 	if err != nil {
@@ -36,6 +37,7 @@ func (s *token) GenerateToken(ctx context.Context, user entities.Token) (*schema
 	return userToken, nil
 }
 
+// accessToken создает новый access token
 func (s *token) accessToken(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	key := []byte(s.secretKey)
@@ -53,6 +55,7 @@ func (s *token) accessToken(username string) (string, error) {
 	return tokenString, nil
 }
 
+// refreshToken создает новый refresh token
 func (s *token) refreshToken(username string) (*entities.Token, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	key := []byte(s.secretKey)
@@ -72,7 +75,7 @@ func (s *token) refreshToken(username string) (*entities.Token, error) {
 
 	entity := &entities.Token{
 		RefreshToken: tokenString,
-		ExpTime:      exprTime,
+		ExpTime:      float64(exprTime),
 	}
 
 	return entity, nil

@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// registration отвечает за регистрацию пользователей
 type registration struct {
 	registrationRepo registrationRepo
 	token            token
@@ -28,6 +29,8 @@ func New(registrationRepo registrationRepo, token token) *registration {
 	return &registration{registrationRepo: registrationRepo, token: token}
 }
 
+// RegisterUser проводит регистрацию пользователя.
+// Создает пользователя в базе, возвращает токен
 func (s *registration) RegisterUser(ctx context.Context, user schema.Registration) (*schema.Token, error) {
 	userID, err := s.registrationRepo.CreateUser(ctx, user)
 	if err != nil {

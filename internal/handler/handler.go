@@ -7,14 +7,14 @@ import (
 )
 
 type handler struct {
-	service service
+	service srv
 }
 
-type service interface {
+type srv interface {
 	RegisterUser(ctx context.Context, user schema.Registration) (*schema.Token, error)
 	RestoreToken(ctx context.Context, token string) (*schema.Token, error)
 }
 
-func New(service service) *handler {
+func New(service srv) *handler {
 	return &handler{service}
 }
