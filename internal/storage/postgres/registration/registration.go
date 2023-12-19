@@ -22,7 +22,7 @@ func (db *userRepo) CreateUser(ctx context.Context, user schema.Registration) (u
 	var userID uuid.UUID
 
 	tx := db.conn.MustBegin()
-	rows, err := tx.QueryxContext(ctx, `insert into auth.users (username, hash_password, fullname) values($1, $2, $3) returning user_id`, user.Username, user.HashedPassword, user.FullName)
+	rows, err := tx.QueryxContext(ctx, `insert into auth.users (username, hash_password, first_name, last_name, patronymic) values($1, $2, $3, $4, $5) returning user_id`, user.Username, user.HashedPassword, user.FirstName, user.LastName, user.Patronymic)
 	if err != nil {
 		switch t := err.(type) {
 		case *pq.Error: // refactor
@@ -94,7 +94,7 @@ func (db *userRepo) insertPhone(ctx context.Context, tx *sqlx.Tx, userID uuid.UU
 func (db *userRepo) GetUserID(ctx context.Context, username string) (uuid.UUID, error) {
 	var id uuid.UUID
 
-	err := db.conn.GetContext(ctx, id, `select user_id from auth.users where username = ?`, username)
+	err := db.conn.GetContext(ctx, &id, `select user_id from auth.users where username = $1`, username)
 	if err != nil {
 		return uuid.UUID{}, err
 	}

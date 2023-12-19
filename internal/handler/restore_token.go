@@ -23,7 +23,7 @@ func (h *handler) RestoreToken(ctx *gin.Context) {
 		}
 	}
 
-	jsonMsg := gin.H{"message": "user successfully created", "access-token": token.AccessToken, "refresh-token": token.RefreshToken}
+	jsonMsg := gin.H{"message": "successfully created token", "access-token": token.AccessToken, "refresh-token": token.RefreshToken}
 
 	ctx.JSON(http.StatusOK, jsonMsg)
 }

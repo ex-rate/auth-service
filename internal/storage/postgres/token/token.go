@@ -2,6 +2,7 @@ package token
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/ex-rate/auth-service/internal/entities"
@@ -37,7 +38,9 @@ func (db *tokenRepo) CreateToken(ctx context.Context, user *entities.Token) erro
 func (db *tokenRepo) CheckToken(ctx context.Context, token *entities.Token) error {
 	var id int
 
-	err := db.conn.GetContext(ctx, &id, `select id from auth.refresh_tokens where token = :token and expiration_time < :expiration_time`, token)
+	fmt.Println(token.RefreshToken)
+
+	err := db.conn.GetContext(ctx, &id, `select id from auth.refresh_tokens where token = $1`, token.RefreshToken)
 	if err != nil {
 		return err
 	}
