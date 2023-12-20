@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,24 +15,26 @@ import (
 	registration "github.com/ex-rate/auth-service/internal/service/registration"
 	token "github.com/ex-rate/auth-service/internal/service/token"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// url: /confirm, status code: StatusOK
+// POST /confirm, status code: StatusOK
 func TestHandler_Confirm_StatusOK(t *testing.T) {
 	type args struct {
-		body schema.Registration
+		body      schema.Registration
+		user      string
+		secretKey string
 	}
 	tests := []struct {
-		name         string
-		method       string
-		url          string
-		statusCode   int
-		args         args
-		expectedBody gin.H
+		name       string
+		method     string
+		url        string
+		statusCode int
+		args       args
 	}{
 		{
 			name:       "valid JSON with email",
@@ -39,7 +42,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			url:        "/confirm",
 			statusCode: http.StatusOK,
 			args: args{
-				schema.Registration{
+				body: schema.Registration{
 					Email:          "test@mail.ru",
 					HashedPassword: "test1",
 					Username:       "test",
@@ -47,11 +50,8 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 					LastName:       "test",
 					Patronymic:     "test",
 				},
-			},
-			expectedBody: gin.H{
-				"message":       "user successfully created",
-				"access-token":  gomock.Any(),
-				"refresh-token": gomock.Any(),
+				user:      "test",
+				secretKey: "secret",
 			},
 		},
 		{
@@ -60,7 +60,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			url:        "/confirm",
 			statusCode: http.StatusOK,
 			args: args{
-				schema.Registration{
+				body: schema.Registration{
 					PhoneNumber:    "79999999999",
 					HashedPassword: "test1",
 					Username:       "test",
@@ -68,11 +68,8 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 					LastName:       "test",
 					Patronymic:     "test",
 				},
-			},
-			expectedBody: gin.H{
-				"message":       "user successfully created",
-				"access-token":  gomock.Any(),
-				"refresh-token": gomock.Any(),
+				user:      "test",
+				secretKey: "secret",
 			},
 		},
 	}
@@ -119,12 +116,28 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			err = dec.Decode(&actualBody)
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.expectedBody, actualBody)
+			token := actualBody["refresh-token"].(string)
+			checkUsername(t, token, tt.args.user, tt.args.secretKey)
 		})
 	}
 }
 
-// url: /confirm, status code: StatusBadRequest
+func checkUsername(t *testing.T, token, username, secretKey string) {
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("there was an error")
+		}
+		return []byte(secretKey), nil
+	})
+	assert.NoError(t, err)
+
+	mapClaims := jwtToken.Claims.(jwt.MapClaims)
+	actualUser := mapClaims["user"].(string)
+
+	assert.Equal(t, username, actualUser, fmt.Sprintf("username not equal: expected: %v actual: %v", username, actualUser))
+}
+
+// POST /confirm, status code: StatusBadRequest
 func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 	type args struct {
 		body schema.Registration

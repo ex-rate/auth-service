@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// url: /signup, status code: StatusBadRequest
+// POST /signup, status code: StatusBadRequest
 func TestHandler_SignUp_StatusBadRequest(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -65,7 +65,7 @@ func TestHandler_SignUp_StatusBadRequest(t *testing.T) {
 	}
 }
 
-// url: /signup, status code: StatusPermanentRedirect
+// POST /signup, status code: StatusPermanentRedirect
 func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 	type args struct {
 		body schema.Registration

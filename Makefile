@@ -16,4 +16,7 @@ dropdb:
 test:
 	go test ./...
 
-.PHONY: initdb dropdb test
+mocks:
+	go generate ./...
+
+.PHONY: initdb dropdb test mocks

@@ -35,12 +35,12 @@ func (s *Token) CheckRefreshToken(ctx context.Context, token string) (string, er
 		return []byte(s.secretKey), nil
 	})
 
-	if err != nil {
-		return "", err
-	}
-
 	if !t.Valid {
 		return "", api_errors.ErrInvalidToken
+	}
+
+	if err != nil {
+		return "", err
 	}
 
 	mapClaims := t.Claims.(jwt.MapClaims)
@@ -64,12 +64,12 @@ func (s *Token) CheckAccessToken(token string) error {
 		return []byte(s.secretKey), nil
 	})
 
-	if err != nil {
-		return err
-	}
-
 	if !t.Valid {
 		return api_errors.ErrInvalidToken
+	}
+
+	if err != nil {
+		return err
 	}
 
 	return nil

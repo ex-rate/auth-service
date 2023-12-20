@@ -9,8 +9,8 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// GenerateToken генерирует новые токены: refresh и access
-func (s *Token) GenerateToken(ctx context.Context, user entities.Token) (*schema.Token, error) {
+// GenerateTokens генерирует новые токены: refresh и access
+func (s *Token) GenerateTokens(ctx context.Context, user entities.Token) (*schema.Token, error) {
 	accessToken, err := s.accessToken(user.Username)
 	if err != nil {
 		return nil, err

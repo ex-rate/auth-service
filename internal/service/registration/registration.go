@@ -39,7 +39,7 @@ func (s *Registration) RegisterUser(ctx context.Context, user schema.Registratio
 		Username: user.Username,
 	}
 
-	return s.token.GenerateToken(ctx, entity)
+	return s.token.GenerateTokens(ctx, entity)
 }
 
 func (s *Registration) GetUserID(ctx context.Context, username string) (uuid.UUID, error) {

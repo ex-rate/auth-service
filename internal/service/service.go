@@ -52,5 +52,5 @@ func (s *Service) RestoreToken(ctx context.Context, token entities.RestoreToken)
 		Username: username,
 	}
 
-	return s.token.GenerateToken(ctx, user)
+	return s.token.GenerateTokens(ctx, user)
 }

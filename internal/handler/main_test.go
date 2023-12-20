@@ -42,7 +42,7 @@ func runTestServer(handler handler) (*gin.Engine, error) {
 
 	r.POST("/signup", handler.Registration)
 	r.POST("/confirm", handler.Confirm)
-	r.POST("/restore_token", handler.RestoreToken)
+	r.PUT("/restore_token", handler.RestoreToken)
 
 	return r, nil
 }

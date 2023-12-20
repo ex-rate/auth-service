@@ -8,7 +8,6 @@ import (
 	context "context"
 	reflect "reflect"
 
-	entities "github.com/ex-rate/auth-service/internal/entities"
 	schema "github.com/ex-rate/auth-service/internal/schemas"
 	gomock "github.com/golang/mock/gomock"
 	uuid "github.com/google/uuid"
@@ -65,42 +64,4 @@ func (m *MockregistrationRepo) GetUserID(ctx context.Context, username string) (
 func (mr *MockregistrationRepoMockRecorder) GetUserID(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserID", reflect.TypeOf((*MockregistrationRepo)(nil).GetUserID), ctx, username)
-}
-
-// Mocktoken is a mock of token interface.
-type Mocktoken struct {
-	ctrl     *gomock.Controller
-	recorder *MocktokenMockRecorder
-}
-
-// MocktokenMockRecorder is the mock recorder for Mocktoken.
-type MocktokenMockRecorder struct {
-	mock *Mocktoken
-}
-
-// NewMocktoken creates a new mock instance.
-func NewMocktoken(ctrl *gomock.Controller) *Mocktoken {
-	mock := &Mocktoken{ctrl: ctrl}
-	mock.recorder = &MocktokenMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *Mocktoken) EXPECT() *MocktokenMockRecorder {
-	return m.recorder
-}
-
-// GenerateToken mocks base method.
-func (m *Mocktoken) GenerateToken(ctx context.Context, user entities.Token) (*schema.Token, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateToken", ctx, user)
-	ret0, _ := ret[0].(*schema.Token)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GenerateToken indicates an expected call of GenerateToken.
-func (mr *MocktokenMockRecorder) GenerateToken(ctx, user interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateToken", reflect.TypeOf((*Mocktoken)(nil).GenerateToken), ctx, user)
 }

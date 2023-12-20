@@ -19,7 +19,6 @@ func (h *handler) RestoreToken(ctx *gin.Context) {
 	// забираем акссес токен из хедера
 	accessTokenString := ctx.Request.Header.Get(AuthorizationHeader)
 	accessToken := strings.Split(accessTokenString, "Bearer ")[1]
-	token.AccessToken = accessToken
 
 	// забираем рефреш токен из тела запроса
 	dec := json.NewDecoder(ctx.Request.Body)
@@ -28,6 +27,8 @@ func (h *handler) RestoreToken(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
+
+	token.AccessToken = accessToken
 
 	newToken, err := h.service.RestoreToken(ctx.Request.Context(), token)
 	if err != nil {
