@@ -12,7 +12,7 @@ import (
 func (h *handler) Confirm(ctx *gin.Context) {
 	var user schema.Registration
 	if err := ctx.BindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid JSON", "err": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -27,7 +27,7 @@ func (h *handler) Confirm(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "an error occured while creating user", "err": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 

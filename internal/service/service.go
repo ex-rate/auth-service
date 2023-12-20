@@ -5,31 +5,22 @@ import (
 
 	"github.com/ex-rate/auth-service/internal/entities"
 	schema "github.com/ex-rate/auth-service/internal/schemas"
-	passw "github.com/ex-rate/auth-service/internal/service/token"
-	"github.com/google/uuid"
+	registration "github.com/ex-rate/auth-service/internal/service/registration"
+	token "github.com/ex-rate/auth-service/internal/service/token"
 )
 
-type service struct {
-	user  user
-	token token
+type Service struct {
+	user  *registration.Registration
+	token *token.Token
 }
 
-type user interface {
-	RegisterUser(ctx context.Context, user schema.Registration) (*schema.Token, error)
-	GetUserID(ctx context.Context, username string) (uuid.UUID, error)
+func New(user *registration.Registration, token *token.Token) *Service {
+	return &Service{user, token}
 }
 
-type token interface {
-	CheckToken(ctx context.Context, token string) (string, error)
-	GenerateToken(ctx context.Context, user entities.Token) (*schema.Token, error)
-}
-
-func New(user user, token token) *service {
-	return &service{user, token}
-}
-
-func (s *service) RegisterUser(ctx context.Context, user schema.Registration) (*schema.Token, error) {
-	password, err := passw.HashPassword(user.HashedPassword)
+// RegisterUser проводит регистрацию пользователя
+func (s *Service) RegisterUser(ctx context.Context, user schema.Registration) (*schema.Token, error) {
+	password, err := token.HashPassword(user.HashedPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +30,14 @@ func (s *service) RegisterUser(ctx context.Context, user schema.Registration) (*
 	return s.user.RegisterUser(ctx, user)
 }
 
-func (s *service) RestoreToken(ctx context.Context, token string) (*schema.Token, error) {
-	username, err := s.token.CheckToken(ctx, token)
+// RestoreToken проверяет на валидность токен и выдает новый
+func (s *Service) RestoreToken(ctx context.Context, token entities.RestoreToken) (*schema.Token, error) {
+	err := s.token.CheckAccessToken(token.AccessToken)
+	if err != nil {
+		return nil, err
+	}
+
+	username, err := s.token.CheckRefreshToken(ctx, token.RefreshToken)
 	if err != nil {
 		return nil, err
 	}

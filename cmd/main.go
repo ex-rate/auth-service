@@ -92,7 +92,7 @@ func setup(path, name string) *http.Server {
 
 	r.POST("/signup", handler.Registration)
 	r.POST("/confirm", handler.Confirm)
-	r.POST("/restore_token", handler.RestoreToken)
+	r.PUT("/restore_token", handler.RestoreToken)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", conf.ServerHost, conf.ServerPort),

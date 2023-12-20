@@ -10,3 +10,8 @@ type Token struct {
 	RefreshToken string    `db:"token"`
 	ExpTime      float64   `db:"expiration_time"`
 }
+
+type RestoreToken struct {
+	RefreshToken string `json:"refresh-token"`
+	AccessToken  string
+}

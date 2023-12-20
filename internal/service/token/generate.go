@@ -10,7 +10,7 @@ import (
 )
 
 // GenerateToken генерирует новые токены: refresh и access
-func (s *token) GenerateToken(ctx context.Context, user entities.Token) (*schema.Token, error) {
+func (s *Token) GenerateToken(ctx context.Context, user entities.Token) (*schema.Token, error) {
 	accessToken, err := s.accessToken(user.Username)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (s *token) GenerateToken(ctx context.Context, user entities.Token) (*schema
 }
 
 // accessToken создает новый access token
-func (s *token) accessToken(username string) (string, error) {
+func (s *Token) accessToken(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	key := []byte(s.secretKey)
 
@@ -56,7 +56,7 @@ func (s *token) accessToken(username string) (string, error) {
 }
 
 // refreshToken создает новый refresh token
-func (s *token) refreshToken(username string) (*entities.Token, error) {
+func (s *Token) refreshToken(username string) (*entities.Token, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	key := []byte(s.secretKey)
 
