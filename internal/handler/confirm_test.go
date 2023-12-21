@@ -14,6 +14,7 @@ import (
 	"github.com/ex-rate/auth-service/internal/service"
 	registration "github.com/ex-rate/auth-service/internal/service/registration"
 	token "github.com/ex-rate/auth-service/internal/service/token"
+	"github.com/ex-rate/auth-service/pkg/random"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/golang/mock/gomock"
@@ -43,14 +44,13 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			statusCode: http.StatusOK,
 			args: args{
 				body: schema.Registration{
-					Email:          "test@mail.ru",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					Email:          random.Email(5),
+					HashedPassword: random.String(5),
+					Username:       random.String(5),
+					FirstName:      random.String(5),
+					LastName:       random.String(5),
+					Patronymic:     random.String(13),
 				},
-				user:      "test",
 				secretKey: "secret",
 			},
 		},
@@ -61,14 +61,47 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			statusCode: http.StatusOK,
 			args: args{
 				body: schema.Registration{
-					PhoneNumber:    "79999999999",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					PhoneNumber:    random.Phone(),
+					HashedPassword: random.String(11),
+					Username:       random.String(5),
+					FirstName:      random.String(7),
+					LastName:       random.String(8),
+					Patronymic:     random.String(12),
 				},
-				user:      "test",
+				secretKey: "secret",
+			},
+		},
+		{
+			name:       "valid JSON with email: long data",
+			method:     http.MethodPost,
+			url:        "/confirm",
+			statusCode: http.StatusOK,
+			args: args{
+				body: schema.Registration{
+					Email:          random.Email(100),
+					HashedPassword: random.String(72),
+					Username:       random.String(100),
+					FirstName:      random.String(100),
+					LastName:       random.String(100),
+					Patronymic:     random.String(100),
+				},
+				secretKey: "secret",
+			},
+		},
+		{
+			name:       "valid JSON with phone: long data",
+			method:     http.MethodPost,
+			url:        "/confirm",
+			statusCode: http.StatusOK,
+			args: args{
+				body: schema.Registration{
+					Email:          random.Phone(),
+					HashedPassword: random.String(72),
+					Username:       random.String(100),
+					FirstName:      random.String(100),
+					LastName:       random.String(100),
+					Patronymic:     random.String(100),
+				},
 				secretKey: "secret",
 			},
 		},
@@ -78,6 +111,8 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
+
+			tt.args.user = tt.args.body.Username
 
 			tokenRepo := mock_service.NewMocktokenRepo(ctrl)
 			registrationRepo := mock_service.NewMockregistrationRepo(ctrl)
@@ -158,12 +193,12 @@ func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 			args: args{
 				schema.Registration{
-					Email:          "test@mail.ru",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					Email:          random.Email(6),
+					HashedPassword: random.String(7),
+					Username:       random.String(12),
+					FirstName:      random.String(7),
+					LastName:       random.String(8),
+					Patronymic:     random.String(13),
 				},
 			},
 			dbErr: api_errors.ErrUsernameAlreadyExists,
@@ -175,12 +210,12 @@ func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 			args: args{
 				schema.Registration{
-					PhoneNumber:    "79999999999",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					PhoneNumber:    random.Phone(),
+					HashedPassword: random.String(6),
+					Username:       random.String(11),
+					FirstName:      random.String(5),
+					LastName:       random.String(8),
+					Patronymic:     random.String(14),
 				},
 			},
 			dbErr: api_errors.ErrUsernameAlreadyExists,
@@ -192,12 +227,12 @@ func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 			args: args{
 				schema.Registration{
-					Email:          "test@mail.ru",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					Email:          random.Email(6),
+					HashedPassword: random.String(7),
+					Username:       random.String(12),
+					FirstName:      random.String(7),
+					LastName:       random.String(8),
+					Patronymic:     random.String(13),
 				},
 			},
 			dbErr: api_errors.ErrEmailAlreadyExists,
@@ -209,12 +244,12 @@ func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 			statusCode: http.StatusBadRequest,
 			args: args{
 				schema.Registration{
-					PhoneNumber:    "79999999999",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					PhoneNumber:    random.Phone(),
+					HashedPassword: random.String(5),
+					Username:       random.String(11),
+					FirstName:      random.String(7),
+					LastName:       random.String(4),
+					Patronymic:     random.String(14),
 				},
 			},
 			dbErr: api_errors.ErrPhoneAlreadyExists,

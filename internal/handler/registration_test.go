@@ -12,6 +12,7 @@ import (
 	"github.com/ex-rate/auth-service/internal/service"
 	registration "github.com/ex-rate/auth-service/internal/service/registration"
 	token "github.com/ex-rate/auth-service/internal/service/token"
+	"github.com/ex-rate/auth-service/pkg/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -84,12 +85,12 @@ func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 			statusCode: http.StatusPermanentRedirect,
 			args: args{
 				schema.Registration{
-					Email:          "test@mail.ru",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					Email:          random.Email(4),
+					HashedPassword: random.String(10),
+					Username:       random.String(5),
+					FirstName:      random.String(5),
+					LastName:       random.String(5),
+					Patronymic:     random.String(5),
 				},
 			},
 		},
@@ -100,12 +101,12 @@ func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 			statusCode: http.StatusPermanentRedirect,
 			args: args{
 				schema.Registration{
-					PhoneNumber:    "79999999999",
-					HashedPassword: "test1",
-					Username:       "test",
-					FirstName:      "test",
-					LastName:       "test",
-					Patronymic:     "test",
+					PhoneNumber:    random.Phone(),
+					HashedPassword: random.String(8),
+					Username:       random.String(9),
+					FirstName:      random.String(4),
+					LastName:       random.String(6),
+					Patronymic:     random.String(4),
 				},
 			},
 		},
