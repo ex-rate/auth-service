@@ -3,40 +3,45 @@ package service
 import (
 	"context"
 
+	"github.com/ex-rate/auth-service/internal/entities"
 	schema "github.com/ex-rate/auth-service/internal/schemas"
-	service "github.com/ex-rate/auth-service/internal/service/token"
+	token "github.com/ex-rate/auth-service/internal/service/token"
+
+	"github.com/google/uuid"
 )
 
-type registration struct {
+// Registration отвечает за регистрацию пользователей
+type Registration struct {
 	registrationRepo registrationRepo
-	token            token
+	token            *token.Token
 }
 
 //go:generate mockgen -source registration.go -destination ../../mocks/registration_repo.go
 type registrationRepo interface {
-	CreateUser(ctx context.Context, reg schema.Registration) error
+	CreateUser(ctx context.Context, reg schema.Registration) (uuid.UUID, error)
+	GetUserID(ctx context.Context, username string) (uuid.UUID, error)
 }
 
-type token interface {
-	GenerateToken(reg schema.Registration) (string, error)
+func New(registrationRepo registrationRepo, token *token.Token) *Registration {
+	return &Registration{registrationRepo: registrationRepo, token: token}
 }
 
-func New(registrationRepo registrationRepo, token token) *registration {
-	return &registration{registrationRepo: registrationRepo, token: token}
-}
-
-func (s *registration) RegisterUser(ctx context.Context, user schema.Registration) (string, error) {
-	password, err := service.HashPassword(user.HashedPassword)
+// RegisterUser проводит регистрацию пользователя.
+// Создает пользователя в базе, возвращает токен
+func (s *Registration) RegisterUser(ctx context.Context, user schema.Registration) (*schema.Token, error) {
+	userID, err := s.registrationRepo.CreateUser(ctx, user)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	user.HashedPassword = password
-
-	err = s.registrationRepo.CreateUser(ctx, user) // создаем юзера в базе
-	if err != nil {
-		return "", err
+	entity := entities.Token{
+		UserID:   userID,
+		Username: user.Username,
 	}
 
-	return s.token.GenerateToken(user)
+	return s.token.GenerateTokens(ctx, entity)
 }
+
+// func (s *Registration) GetUserID(ctx context.Context, username string) (uuid.UUID, error) {
+// 	return s.registrationRepo.GetUserID(ctx, username)
+// }

@@ -6,7 +6,9 @@ CREATE TABLE auth.users (
     user_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     hash_password VARCHAR(255) NOT NULL,
-    fullname VARCHAR(255) NOT NULL
+    last_name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    patronymic VARCHAR(255) NOT NULL -- отчество
 );
 
 -- Создание таблицы "auth.emails" 
@@ -36,6 +38,14 @@ CREATE TABLE auth.tokens (
     user_id UUID REFERENCES auth.users(user_id) ON DELETE CASCADE,
     token VARCHAR(255) NOT NULL,
     expiration_time TIMESTAMP NOT NULL
+);
+
+-- Создание таблицы "auth.refresh_tokens"
+CREATE TABLE auth.refresh_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(user_id) ON DELETE CASCADE UNIQUE,
+    token VARCHAR(255) NOT NULL,
+    expiration_time int NOT NULL
 );
 
 -- Создание таблицы "auth.reset_pwd_tokens"

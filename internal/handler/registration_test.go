@@ -9,11 +9,16 @@ import (
 	"testing"
 
 	schema "github.com/ex-rate/auth-service/internal/schemas"
+	"github.com/ex-rate/auth-service/internal/service"
+	registration "github.com/ex-rate/auth-service/internal/service/registration"
+	token "github.com/ex-rate/auth-service/internal/service/token"
+	"github.com/ex-rate/auth-service/pkg/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_handler_Registration_InvalidJSON(t *testing.T) {
+// POST /signup, status code: StatusBadRequest
+func TestHandler_SignUp_StatusBadRequest(t *testing.T) {
 	tests := []struct {
 		name       string
 		method     string
@@ -33,8 +38,16 @@ func Test_handler_Registration_InvalidJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// в этом тесте БД не нужна
+
+			// services
+			tokenSrv := token.New("secret", nil)
+			registrationSrv := registration.New(nil, tokenSrv)
+
+			service := service.New(registrationSrv, tokenSrv)
+
 			h := &handler{
-				registration: nil,
+				service: service,
 			}
 
 			r, err := runTestServer(*h)
@@ -45,7 +58,7 @@ func Test_handler_Registration_InvalidJSON(t *testing.T) {
 
 			body := strings.NewReader(tt.body)
 
-			resp := testRequest(t, ts, tt.method, tt.url, body)
+			resp := testRequest(t, ts, tt.method, tt.url, body, map[string]string{})
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
@@ -53,7 +66,8 @@ func Test_handler_Registration_InvalidJSON(t *testing.T) {
 	}
 }
 
-func Test_handler_Registration_JSON_Email(t *testing.T) {
+// POST /signup, status code: StatusPermanentRedirect
+func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 	type args struct {
 		body schema.Registration
 	}
@@ -71,10 +85,12 @@ func Test_handler_Registration_JSON_Email(t *testing.T) {
 			statusCode: http.StatusPermanentRedirect,
 			args: args{
 				schema.Registration{
-					Email:          "test@mail.ru",
-					HashedPassword: "test1",
-					Username:       "test",
-					FullName:       "test",
+					Email:          random.Email(4),
+					HashedPassword: random.String(10),
+					Username:       random.String(5),
+					FirstName:      random.String(5),
+					LastName:       random.String(5),
+					Patronymic:     random.String(5),
 				},
 			},
 		},
@@ -85,10 +101,12 @@ func Test_handler_Registration_JSON_Email(t *testing.T) {
 			statusCode: http.StatusPermanentRedirect,
 			args: args{
 				schema.Registration{
-					PhoneNumber:    "79551234545",
-					HashedPassword: "test1",
-					Username:       "test",
-					FullName:       "test",
+					PhoneNumber:    random.Phone(),
+					HashedPassword: random.String(8),
+					Username:       random.String(9),
+					FirstName:      random.String(4),
+					LastName:       random.String(6),
+					Patronymic:     random.String(4),
 				},
 			},
 		},
@@ -96,8 +114,14 @@ func Test_handler_Registration_JSON_Email(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// services
+			tokenSrv := token.New(random.String(5), nil)
+			registrationSrv := registration.New(nil, tokenSrv)
+
+			service := service.New(registrationSrv, tokenSrv)
+
 			h := &handler{
-				registration: nil,
+				service: service,
 			}
 
 			r, err := runTestServer(*h)
@@ -109,7 +133,7 @@ func Test_handler_Registration_JSON_Email(t *testing.T) {
 			bodyJSON, err := json.Marshal(tt.args.body)
 			require.NoError(t, err)
 
-			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON))
+			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), map[string]string{})
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
