@@ -293,12 +293,7 @@ func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 
 			tt.expectedBody = gin.H{"message": tt.dbErr.Error()}
 
-			var actualBody gin.H
-			dec := json.NewDecoder(resp.Body)
-			err = dec.Decode(&actualBody)
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.expectedBody, actualBody)
+			checkBody(t, tt.expectedBody, resp.Body)
 		})
 	}
 }

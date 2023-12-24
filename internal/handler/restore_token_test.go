@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -406,12 +407,7 @@ func TestHandler_RestoreToken_InvalidToken(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 
-			var actualBody gin.H
-			dec := json.NewDecoder(resp.Body)
-			err = dec.Decode(&actualBody)
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.expectedBody, actualBody)
+			checkBody(t, tt.expectedBody, resp.Body)
 		})
 	}
 }
@@ -530,12 +526,7 @@ func TestHandler_RestoreToken_InvalidUsername(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 
-			var actualBody gin.H
-			dec := json.NewDecoder(resp.Body)
-			err = dec.Decode(&actualBody)
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.expectedBody, actualBody)
+			checkBody(t, tt.expectedBody, resp.Body)
 		})
 	}
 }
@@ -649,15 +640,18 @@ func TestHandler_RestoreToken_Unauthorized(t *testing.T) {
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
-
-			var actualBody gin.H
-			dec := json.NewDecoder(resp.Body)
-			err = dec.Decode(&actualBody)
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.expectedBody, actualBody)
+			checkBody(t, tt.expectedBody, resp.Body)
 		})
 	}
+}
+
+func checkBody(t *testing.T, expectedBody gin.H, body io.ReadCloser) {
+	var actualBody gin.H
+	dec := json.NewDecoder(body)
+	err := dec.Decode(&actualBody)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedBody, actualBody)
 }
 
 // generateToken генерирует токен с заданными данными. Возвращает токен и дату истечения
