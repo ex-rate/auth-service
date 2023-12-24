@@ -10,6 +10,7 @@ import (
 
 	entities "github.com/ex-rate/auth-service/internal/entities"
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
 // MocktokenRepo is a mock of tokenRepo interface.
@@ -61,4 +62,19 @@ func (m *MocktokenRepo) CreateToken(ctx context.Context, token *entities.Token) 
 func (mr *MocktokenRepoMockRecorder) CreateToken(ctx, token interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateToken", reflect.TypeOf((*MocktokenRepo)(nil).CreateToken), ctx, token)
+}
+
+// GetUserID mocks base method.
+func (m *MocktokenRepo) GetUserID(ctx context.Context, username string) (uuid.UUID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserID", ctx, username)
+	ret0, _ := ret[0].(uuid.UUID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserID indicates an expected call of GetUserID.
+func (mr *MocktokenRepoMockRecorder) GetUserID(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserID", reflect.TypeOf((*MocktokenRepo)(nil).GetUserID), ctx, username)
 }

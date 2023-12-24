@@ -31,24 +31,13 @@ func (s *Service) RegisterUser(ctx context.Context, user schema.Registration) (*
 }
 
 // RestoreToken проверяет на валидность токен и выдает новый
-func (s *Service) RestoreToken(ctx context.Context, token entities.RestoreToken) (*schema.Token, error) {
-	err := s.token.CheckAccessToken(token.AccessToken)
-	if err != nil {
-		return nil, err
-	}
-
-	username, err := s.token.CheckRefreshToken(ctx, token.RefreshToken)
-	if err != nil {
-		return nil, err
-	}
-
-	userID, err := s.user.GetUserID(ctx, username)
+func (s *Service) RestoreToken(ctx context.Context, token schema.RestoreToken) (*schema.Token, error) {
+	username, err := s.token.CheckTokens(ctx, token)
 	if err != nil {
 		return nil, err
 	}
 
 	user := entities.Token{
-		UserID:   userID,
 		Username: username,
 	}
 

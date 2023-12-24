@@ -115,7 +115,7 @@ func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// services
-			tokenSrv := token.New("secret", nil)
+			tokenSrv := token.New(random.String(5), nil)
 			registrationSrv := registration.New(nil, tokenSrv)
 
 			service := service.New(registrationSrv, tokenSrv)

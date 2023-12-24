@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ex-rate/auth-service/internal/entities"
 	api_errors "github.com/ex-rate/auth-service/internal/errors"
+	schema "github.com/ex-rate/auth-service/internal/schemas"
 	"github.com/gin-gonic/gin"
 )
 
 const AuthorizationHeader = "Authorization"
 
 func (h *handler) RestoreToken(ctx *gin.Context) {
-	var token entities.RestoreToken
+	var token schema.RestoreToken
 
 	// забираем акссес токен из хедера
 	accessTokenString := ctx.Request.Header.Get(AuthorizationHeader)
@@ -33,10 +33,17 @@ func (h *handler) RestoreToken(ctx *gin.Context) {
 	newToken, err := h.service.RestoreToken(ctx.Request.Context(), token)
 	if err != nil {
 		if err != nil {
-			if errors.Is(err, api_errors.ErrInvalidToken) {
+			if errors.Is(err, api_errors.ErrInvalidToken) || errors.Is(err, api_errors.ErrInvalidUsername) ||
+				errors.Is(err, api_errors.ErrTokenNotExists) {
 				ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 				return
 			}
+
+			if errors.Is(err, api_errors.ErrNotAuthorized) {
+				ctx.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
+				return
+			}
+
 			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}

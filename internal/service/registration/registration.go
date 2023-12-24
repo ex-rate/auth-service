@@ -42,6 +42,6 @@ func (s *Registration) RegisterUser(ctx context.Context, user schema.Registratio
 	return s.token.GenerateTokens(ctx, entity)
 }
 
-func (s *Registration) GetUserID(ctx context.Context, username string) (uuid.UUID, error) {
-	return s.registrationRepo.GetUserID(ctx, username)
-}
+// func (s *Registration) GetUserID(ctx context.Context, username string) (uuid.UUID, error) {
+// 	return s.registrationRepo.GetUserID(ctx, username)
+// }

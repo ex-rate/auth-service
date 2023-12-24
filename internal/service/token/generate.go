@@ -11,6 +11,13 @@ import (
 
 // GenerateTokens генерирует новые токены: refresh и access
 func (s *Token) GenerateTokens(ctx context.Context, user entities.Token) (*schema.Token, error) {
+	userID, err := s.tokenRepo.GetUserID(ctx, user.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	user.UserID = userID
+
 	accessToken, err := s.accessToken(user.Username)
 	if err != nil {
 		return nil, err

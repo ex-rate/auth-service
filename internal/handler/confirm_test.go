@@ -51,7 +51,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 					LastName:       random.String(5),
 					Patronymic:     random.String(13),
 				},
-				secretKey: "secret",
+				secretKey: random.String(5),
 			},
 		},
 		{
@@ -68,7 +68,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 					LastName:       random.String(8),
 					Patronymic:     random.String(12),
 				},
-				secretKey: "secret",
+				secretKey: random.String(5),
 			},
 		},
 		{
@@ -85,7 +85,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 					LastName:       random.String(100),
 					Patronymic:     random.String(100),
 				},
-				secretKey: "secret",
+				secretKey: random.String(5),
 			},
 		},
 		{
@@ -102,7 +102,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 					LastName:       random.String(100),
 					Patronymic:     random.String(100),
 				},
-				secretKey: "secret",
+				secretKey: random.String(5),
 			},
 		},
 	}
@@ -118,7 +118,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			registrationRepo := mock_service.NewMockregistrationRepo(ctrl)
 
 			// services
-			tokenSrv := token.New("secret", tokenRepo)
+			tokenSrv := token.New(tt.args.secretKey, tokenRepo)
 			registrationSrv := registration.New(registrationRepo, tokenSrv)
 
 			service := service.New(registrationSrv, tokenSrv)
@@ -140,6 +140,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 
 			registrationRepo.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(id, nil)
 			tokenRepo.EXPECT().CreateToken(gomock.Any(), gomock.Any()).Return(nil)
+			tokenRepo.EXPECT().GetUserID(gomock.Any(), gomock.Any()).Return(id, nil)
 
 			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), map[string]string{})
 			defer resp.Body.Close()
