@@ -9,7 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *handler) Confirm(ctx *gin.Context) {
+// GET /confirm
+func (h *Handler) GetConfirm(ctx *gin.Context) {
+	// TODO: render html
+}
+
+// POST /confirm
+func (h *Handler) Confirm(ctx *gin.Context) {
 	var user schema.Registration
 	if err := ctx.BindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -31,7 +37,11 @@ func (h *handler) Confirm(ctx *gin.Context) {
 		return
 	}
 
-	jsonMsg := gin.H{"message": "user successfully created", "access-token": token.AccessToken, "refresh-token": token.RefreshToken}
+	jsonMsg := gin.H{
+		"message":       "user successfully created",
+		"access-token":  token.AccessToken,
+		"refresh-token": token.RefreshToken,
+	}
 
 	ctx.JSON(http.StatusOK, jsonMsg)
 }

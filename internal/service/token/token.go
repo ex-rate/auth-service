@@ -17,7 +17,7 @@ type Token struct {
 	tokenRepo tokenRepo
 }
 
-//go:generate mockgen -source token.go -destination ../../mocks/token_repo.go
+//go:generate mockgen -source token.go -destination ../../mocks/token_repo.go -package mock_service
 type tokenRepo interface {
 	CreateToken(ctx context.Context, token *entities.Token) error
 	CheckToken(ctx context.Context, token *entities.Token) error

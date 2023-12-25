@@ -16,7 +16,7 @@ type Registration struct {
 	token            *token.Token
 }
 
-//go:generate mockgen -source registration.go -destination ../../mocks/registration_repo.go
+//go:generate mockgen -source registration.go -destination ../../mocks/registration_repo.go -package mock_service
 type registrationRepo interface {
 	CreateUser(ctx context.Context, reg schema.Registration) (uuid.UUID, error)
 	GetUserID(ctx context.Context, username string) (uuid.UUID, error)

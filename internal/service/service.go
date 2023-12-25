@@ -5,6 +5,7 @@ import (
 
 	"github.com/ex-rate/auth-service/internal/entities"
 	schema "github.com/ex-rate/auth-service/internal/schemas"
+	"github.com/ex-rate/auth-service/internal/service/auth"
 	registration "github.com/ex-rate/auth-service/internal/service/registration"
 	token "github.com/ex-rate/auth-service/internal/service/token"
 )
@@ -12,10 +13,11 @@ import (
 type Service struct {
 	user  *registration.Registration
 	token *token.Token
+	auth  *auth.AuthService
 }
 
-func New(user *registration.Registration, token *token.Token) *Service {
-	return &Service{user, token}
+func New(user *registration.Registration, token *token.Token, auth *auth.AuthService) *Service {
+	return &Service{user, token, auth}
 }
 
 // RegisterUser проводит регистрацию пользователя
@@ -42,4 +44,14 @@ func (s *Service) RestoreToken(ctx context.Context, token schema.RestoreToken) (
 	}
 
 	return s.token.GenerateTokens(ctx, user)
+}
+
+// AuthWithCode проводит авторизацию пользователя по коду подтверждения через смс / почту
+func (s *Service) AuthWithCode(ctx context.Context, user schema.AuthWithCode) (*schema.Token, error) {
+	return s.auth.WithCode(ctx, user)
+}
+
+// AuthWithPassword проводит авторизацию пользователя по паролю
+func (s *Service) AuthWithPassword(ctx context.Context, user schema.AuthWithPassword) (*schema.Token, error) {
+	return s.auth.WithPassword(ctx, user)
 }

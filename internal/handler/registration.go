@@ -7,7 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *handler) Registration(ctx *gin.Context) {
+// GET /signup
+func (h *Handler) GetRegistration(ctx *gin.Context) {
+	// TODO: html render
+}
+
+// POST /signup
+func (h *Handler) Registration(ctx *gin.Context) {
 	var user schema.Registration
 	if err := ctx.BindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -16,5 +22,5 @@ func (h *handler) Registration(ctx *gin.Context) {
 
 	// TODO: добавить отправку письма / смс кода на тлф
 
-	ctx.Redirect(http.StatusPermanentRedirect, "/confirm")
+	ctx.Redirect(http.StatusMovedPermanently, "/confirm")
 }

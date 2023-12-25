@@ -44,21 +44,20 @@ func TestHandler_SignUp_StatusBadRequest(t *testing.T) {
 			tokenSrv := token.New("secret", nil)
 			registrationSrv := registration.New(nil, tokenSrv)
 
-			service := service.New(registrationSrv, tokenSrv)
+			service := service.New(registrationSrv, tokenSrv, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 
 			body := strings.NewReader(tt.body)
 
-			resp := testRequest(t, ts, tt.method, tt.url, body, map[string]string{})
+			resp := testRequest(t, ts, tt.method, tt.url, body, nil)
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
@@ -82,7 +81,7 @@ func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 			name:       "valid JSON with email",
 			method:     http.MethodPost,
 			url:        "/signup",
-			statusCode: http.StatusPermanentRedirect,
+			statusCode: http.StatusMovedPermanently,
 			args: args{
 				schema.Registration{
 					Email:          random.Email(4),
@@ -98,7 +97,7 @@ func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 			name:       "valid JSON with phone",
 			method:     http.MethodPost,
 			url:        "/signup",
-			statusCode: http.StatusPermanentRedirect,
+			statusCode: http.StatusMovedPermanently,
 			args: args{
 				schema.Registration{
 					PhoneNumber:    random.Phone(),
@@ -118,14 +117,13 @@ func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 			tokenSrv := token.New(random.String(5), nil)
 			registrationSrv := registration.New(nil, tokenSrv)
 
-			service := service.New(registrationSrv, tokenSrv)
+			service := service.New(registrationSrv, tokenSrv, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -133,7 +131,7 @@ func TestHandler_SignUp_StatusPermanentRedirect(t *testing.T) {
 			bodyJSON, err := json.Marshal(tt.args.body)
 			require.NoError(t, err)
 
-			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), map[string]string{})
+			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), nil)
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)

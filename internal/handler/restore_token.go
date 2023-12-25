@@ -13,7 +13,8 @@ import (
 
 const AuthorizationHeader = "Authorization"
 
-func (h *handler) RestoreToken(ctx *gin.Context) {
+// PUT /restore_token
+func (h *Handler) RestoreToken(ctx *gin.Context) {
 	var token schema.RestoreToken
 
 	// забираем акссес токен из хедера
@@ -49,7 +50,11 @@ func (h *handler) RestoreToken(ctx *gin.Context) {
 		}
 	}
 
-	jsonMsg := gin.H{"message": "successfully created token", "access-token": newToken.AccessToken, "refresh-token": newToken.RefreshToken}
+	jsonMsg := gin.H{
+		"message":       "successfully created token",
+		"access-token":  newToken.AccessToken,
+		"refresh-token": newToken.RefreshToken,
+	}
 
 	ctx.JSON(http.StatusOK, jsonMsg)
 }

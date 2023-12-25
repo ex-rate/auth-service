@@ -121,14 +121,13 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			tokenSrv := token.New(tt.args.secretKey, tokenRepo)
 			registrationSrv := registration.New(registrationRepo, tokenSrv)
 
-			service := service.New(registrationSrv, tokenSrv)
+			service := service.New(registrationSrv, tokenSrv, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -142,7 +141,7 @@ func TestHandler_Confirm_StatusOK(t *testing.T) {
 			tokenRepo.EXPECT().CreateToken(gomock.Any(), gomock.Any()).Return(nil)
 			tokenRepo.EXPECT().GetUserID(gomock.Any(), gomock.Any()).Return(id, nil)
 
-			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), map[string]string{})
+			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), nil)
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
@@ -267,14 +266,13 @@ func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 			// services
 			registrationSrv := registration.New(registrationRepo, nil)
 
-			service := service.New(registrationSrv, nil)
+			service := service.New(registrationSrv, nil, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -286,7 +284,7 @@ func TestHandler_Confirm_StatusBadRequest(t *testing.T) {
 
 			registrationRepo.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(id, tt.dbErr)
 
-			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), map[string]string{})
+			resp := testRequest(t, ts, tt.method, tt.url, bytes.NewReader(bodyJSON), nil)
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)

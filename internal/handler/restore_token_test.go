@@ -100,14 +100,13 @@ func TestHandler_RestoreToken_StatusOK(t *testing.T) {
 			tokenSrv := token.New(tt.args.secretKey, tokenRepo)
 			registrationSrv := registration.New(nil, tokenSrv)
 
-			service := service.New(registrationSrv, tokenSrv)
+			service := service.New(registrationSrv, tokenSrv, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -380,14 +379,13 @@ func TestHandler_RestoreToken_InvalidToken(t *testing.T) {
 			tokenSrv := token.New(tt.args.secretKey, nil)
 			registrationSrv := registration.New(nil, tokenSrv)
 
-			service := service.New(registrationSrv, tokenSrv)
+			service := service.New(registrationSrv, tokenSrv, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -499,14 +497,13 @@ func TestHandler_RestoreToken_InvalidUsername(t *testing.T) {
 			tokenSrv := token.New(tt.args.secretKey, nil)
 			registrationSrv := registration.New(nil, tokenSrv)
 
-			service := service.New(registrationSrv, tokenSrv)
+			service := service.New(registrationSrv, tokenSrv, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -614,14 +611,13 @@ func TestHandler_RestoreToken_Unauthorized(t *testing.T) {
 			tokenSrv := token.New(tt.args.secretKey, nil)
 			registrationSrv := registration.New(nil, tokenSrv)
 
-			service := service.New(registrationSrv, tokenSrv)
+			service := service.New(registrationSrv, tokenSrv, nil)
 
-			h := &handler{
+			h := &Handler{
 				service: service,
 			}
 
-			r, err := runTestServer(*h)
-			require.NoError(t, err)
+			r := runTestServer(*h)
 
 			ts := httptest.NewServer(r)
 			defer ts.Close()

@@ -37,12 +37,31 @@ func testRequest(t *testing.T, ts *httptest.Server, method,
 	return resp
 }
 
-func runTestServer(handler handler) (*gin.Engine, error) {
+func runTestServer(handler Handler) *gin.Engine {
 	r := gin.Default()
 
+	// registration
+	r.GET("/signup", handler.GetRegistration)
 	r.POST("/signup", handler.Registration)
+
+	// confirm registration
+	r.GET("/confirm", handler.GetConfirm)
 	r.POST("/confirm", handler.Confirm)
+
+	// restore token
 	r.PUT("/restore_token", handler.RestoreToken)
 
-	return r, nil
+	// authorization
+	r.GET("/login", handler.GetAuth)
+	r.POST("/login", handler.Auth)
+
+	// authorization via code
+	r.GET("/code", handler.GetCode)
+	r.POST("/code", handler.Code)
+
+	// authorization via password
+	r.GET("/password", handler.GetPassword)
+	r.POST("/password", handler.Password)
+
+	return r
 }
