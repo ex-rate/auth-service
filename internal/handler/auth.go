@@ -48,6 +48,7 @@ func (h *Handler) Code(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 
 	jsonMsg := gin.H{
@@ -80,6 +81,7 @@ func (h *Handler) Password(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 
 	jsonMsg := gin.H{

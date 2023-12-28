@@ -14,6 +14,7 @@ import (
 	"github.com/ex-rate/auth-service/internal/service/auth"
 	token "github.com/ex-rate/auth-service/internal/service/token"
 	"github.com/ex-rate/auth-service/pkg/random"
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -86,7 +87,6 @@ func TestHandler_AuthWithPassword_StatusOK(t *testing.T) {
 			defer resp.Body.Close()
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
-
 		})
 	}
 }
@@ -101,6 +101,7 @@ func TestHandler_AuthWithPassword_IncorrectPassword(t *testing.T) {
 		requestBody  schema.AuthWithPassword
 		hashPassword string
 		statusCode   int
+		expectedBody gin.H
 	}{
 		{
 			name:      "positive case",
@@ -113,6 +114,9 @@ func TestHandler_AuthWithPassword_IncorrectPassword(t *testing.T) {
 			},
 			statusCode:   http.StatusBadRequest,
 			hashPassword: random.String(15),
+			expectedBody: gin.H{
+				"message": api_errors.ErrIncorrectPassword.Error(),
+			},
 		},
 	}
 
@@ -152,6 +156,7 @@ func TestHandler_AuthWithPassword_IncorrectPassword(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 
+			checkBody(t, tt.expectedBody, resp.Body)
 		})
 	}
 }
@@ -166,6 +171,7 @@ func TestHandler_AuthWithPassword_UserNotExists(t *testing.T) {
 		requestBody  schema.AuthWithPassword
 		hashPassword string
 		statusCode   int
+		expectedBody gin.H
 	}{
 		{
 			name:      "positive case",
@@ -178,6 +184,9 @@ func TestHandler_AuthWithPassword_UserNotExists(t *testing.T) {
 			},
 			statusCode:   http.StatusBadRequest,
 			hashPassword: random.String(15),
+			expectedBody: gin.H{
+				"message": api_errors.ErrUserNotExists.Error(),
+			},
 		},
 	}
 
@@ -214,6 +223,7 @@ func TestHandler_AuthWithPassword_UserNotExists(t *testing.T) {
 
 			assert.Equal(t, tt.statusCode, resp.StatusCode)
 
+			checkBody(t, tt.expectedBody, resp.Body)
 		})
 	}
 }
